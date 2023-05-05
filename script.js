@@ -54,3 +54,4 @@ class MazeBuilder {
 
 let mz = new MazeBuilder(800, 12, 10);
 mz.buildMaze();
+console.log(mz.grid[0][0].getNeighbour(mz.grid));

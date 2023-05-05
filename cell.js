@@ -112,4 +112,35 @@ export default class Cell {
       this.size / this.rows - 10
     );
   }
+
+  getNeighbour(grid) {
+    let neighbours = [];
+    let i = {
+      a: this.x - 1,
+      b: this.x,
+      c: this.x + 1,
+    };
+    let j = {
+      a: this.y - 1,
+      b: this.y,
+      c: this.y + 1,
+    };
+
+    for (const i_prop in i)
+      for (const j_prop in j)
+        if (
+          (i[i_prop] !== this.x || j[j_prop] !== this.y) &&
+          (i[i_prop] !== i["c"] || j[j_prop] !== j["c"]) &&
+          i[i_prop] <= this.rows - 1 &&
+          i[i_prop] >= 0 &&
+          j[j_prop] <= this.cols - 1 &&
+          j[j_prop] >= 0
+        ) {
+          neighbours.push(grid[i[i_prop]][j[j_prop]]);
+        }
+
+    console.log(neighbours);
+    let num = Math.floor(Math.random() * neighbours.length);
+    return neighbours[num];
+  }
 }
