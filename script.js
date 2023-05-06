@@ -1,4 +1,5 @@
 import Cell from "./cell.js";
+const TIME = 1;
 
 var canvas = document.getElementById("mazeCanvas");
 
@@ -12,6 +13,7 @@ class MazeBuilder {
     this.grid = [];
     this.stack = [];
     this.setup();
+    this.shortPathStack = [];
   }
 
   setup() {
@@ -38,7 +40,6 @@ class MazeBuilder {
   }
 
   render(current) {
-    console.log("RENDERING");
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, this.size, this.size);
 
@@ -52,8 +53,15 @@ class MazeBuilder {
     );
   }
 
+  async sleep(millis) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, millis);
+    });
+  }
+
   async buildMaze() {
-    this.setup();
     let start = this.grid[0][0];
     this.stack.push(start);
 
@@ -69,19 +77,56 @@ class MazeBuilder {
         neighbour.visited = true;
         this.stack.push(neighbour);
       }
-      await sleep(20).then(() => this.render(current));
+      await this.sleep(TIME).then(() =>
+        this.render(current)
+      );
     }
   }
 
-  solveMaze() {}
-}
+  async solveMaze() {
+    let goal = this.grid[this.rows - 1][this.cols - 1];
+    let current = this.grid[0][0];
+    this.stack.push(current);
+    this.shortPathStack.push(current);
+    let neighbour;
 
-async function sleep(millis) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, millis);
-  });
+    for (
+      let r = 0;
+      r < this.rows;
+      r++ //set visited to false for all
+    )
+      for (let c = 0; c < this.cols; c++)
+        this.grid[r][c].visited = false;
+
+    this.grid[0][0].visited = true;
+
+    while (this.stack.length > 0) {
+      current = this.stack.pop();
+      this.shortPathStack.pop();
+
+      if (current.getNeighbours(this.grid)) {
+        let num = Math.floor(
+          Math.random() *
+            current.getNeighbours(this.grid).length
+        );
+        neighbour = current.getNeighbours(this.grid)[num];
+
+        if (JSON.stringify(current) == JSON.stringify(goal))
+          break;
+        else {
+          this.stack.push(current);
+          this.stack.push(neighbour);
+          neighbour.visited = true;
+          this.shortPathStack.push(current);
+          this.shortPathStack.push(neighbour);
+        }
+      }
+
+      await this.sleep(TIME).then(() =>
+        this.render(current)
+      );
+    }
+  }
 }
 
 let diff = document.getElementById("diffSelect");
@@ -91,8 +136,20 @@ diff.addEventListener("change", () => {
 });
 
 let startBtn = document.getElementById("startMazeBtn");
+if (!diff_value) diff_value = 10;
+let mz = new MazeBuilder(800, 30, 30);
+
 startBtn.addEventListener("click", () => {
-  if (!diff_value) diff_value = 10;
-  let mz = new MazeBuilder(800, diff_value, diff_value);
   mz.buildMaze();
+});
+
+let solveBtn = document.getElementById("solveMazeBtn");
+solveBtn.addEventListener("click", () => {
+  console.log(
+    mz.solveMaze().then(async () => {
+      await console.log(mz.shortPathStack);
+      for (let i = 0; i < mz.shortPathStack.length; i++)
+        mz.shortPathStack[i].highlight("red");
+    })
+  );
 });

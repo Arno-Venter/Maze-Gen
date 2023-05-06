@@ -110,11 +110,45 @@ export default class Cell {
     let ctx = canvas.getContext("2d");
     ctx.fillStyle = color;
     ctx.fillRect(
-      (this.y * this.size) / this.cols + 5,
-      (this.x * this.size) / this.rows + 5,
-      this.size / this.cols - 10,
-      this.size / this.rows - 10
+      (this.y * this.size) / this.cols +
+        0.15 * (this.size / this.cols),
+      (this.x * this.size) / this.rows +
+        0.15 * (this.size / this.rows),
+      this.size / this.cols - 0.3 * (this.size / this.cols),
+      this.size / this.rows - 0.3 * (this.size / this.rows)
     );
+  }
+
+  getNeighbours(grid) {
+    let neighbours = [];
+    let i = {
+      a: this.x - 1,
+      b: this.x,
+      c: this.x + 1,
+    };
+    let j = {
+      a: this.y - 1,
+      b: this.y,
+      c: this.y + 1,
+    };
+
+    for (const i_prop in i)
+      for (const j_prop in j)
+        if (
+          (i[i_prop] !== this.x || j[j_prop] !== this.y) &&
+          (i[i_prop] == this.x || j[j_prop] == this.y) &&
+          i[i_prop] <= this.rows - 1 &&
+          i[i_prop] >= 0 &&
+          j[j_prop] <= this.cols - 1 &&
+          j[j_prop] >= 0 &&
+          grid[i[i_prop]][j[j_prop]].movePossible(this) &&
+          grid[i[i_prop]][j[j_prop]].visited == false
+        ) {
+          neighbours.push(grid[i[i_prop]][j[j_prop]]);
+        }
+
+    if (neighbours.length > 0) return neighbours;
+    else return undefined;
   }
 
   getNeighbour(grid) {
@@ -155,5 +189,43 @@ export default class Cell {
     if (validNeighbours.length !== 0)
       return validNeighbours[num];
     else return undefined;
+  }
+
+  movePossible(cell) {
+    //possible to move from cell to this
+    //move backwards direction
+    let x = this.y - cell.y;
+    let y = this.x - cell.x;
+    let possible = false;
+
+    if (
+      x === 1 &&
+      cell.walls.right == false &&
+      this.walls.left == false
+    ) {
+      possible = true;
+    } else if (
+      x === -1 &&
+      cell.walls.left == false &&
+      this.walls.right == false
+    ) {
+      possible = true;
+    }
+
+    if (
+      y === 1 &&
+      cell.walls.bottom == false &&
+      this.walls.top == false
+    ) {
+      possible = true;
+    } else if (
+      y === -1 &&
+      cell.walls.top == false &&
+      this.walls.bottom == false
+    ) {
+      possible = true;
+    }
+
+    return possible;
   }
 }
