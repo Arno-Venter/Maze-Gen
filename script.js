@@ -62,13 +62,9 @@ class MazeBuilder {
 
     while (this.stack.length > 0) {
       current = this.stack.pop();
-      if (current.getNeighbour(this.grid).length > 0) {
+      if (current.getNeighbour(this.grid)) {
         this.stack.push(current);
-        let num = Math.floor(
-          Math.random() *
-            current.getNeighbour(this.grid).length
-        );
-        neighbour = current.getNeighbour(this.grid)[num];
+        neighbour = current.getNeighbour(this.grid);
         current.removeWalls(current, neighbour);
         neighbour.visited = true;
         this.stack.push(neighbour);
@@ -76,6 +72,8 @@ class MazeBuilder {
       await sleep(20).then(() => this.render(current));
     }
   }
+
+  solveMaze() {}
 }
 
 async function sleep(millis) {
@@ -90,11 +88,11 @@ let diff = document.getElementById("diffSelect");
 let diff_value;
 diff.addEventListener("change", () => {
   diff_value = diff.value;
-  console.log(diff_value);
 });
 
 let startBtn = document.getElementById("startMazeBtn");
 startBtn.addEventListener("click", () => {
+  if (!diff_value) diff_value = 10;
   let mz = new MazeBuilder(800, diff_value, diff_value);
   mz.buildMaze();
 });

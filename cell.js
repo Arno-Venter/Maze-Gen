@@ -148,6 +148,12 @@ export default class Cell {
       if (!neighbours[i].visited)
         validNeighbours.push(neighbours[i]);
 
-    return validNeighbours;
+    let num = Math.floor(
+      Math.random() * validNeighbours.length
+    );
+
+    if (validNeighbours.length !== 0)
+      return validNeighbours[num];
+    else return undefined;
   }
 }
