@@ -29,6 +29,7 @@ export default class Cell {
 
     let l = (this.y * this.size) / this.cols;
     let t = (this.x * this.size) / this.rows;
+    ctx.beginPath();
     ctx.moveTo(l, t);
     ctx.lineTo(l + this.size / this.cols, t);
     ctx.stroke();
@@ -42,6 +43,7 @@ export default class Cell {
 
     let l = (this.y * this.size) / this.cols;
     let t = (this.x * this.size) / this.rows;
+    ctx.beginPath();
     ctx.moveTo(l + this.size / this.cols, t);
     ctx.lineTo(
       l + this.size / this.cols,
@@ -58,6 +60,7 @@ export default class Cell {
 
     let l = (this.y * this.size) / this.cols;
     let t = (this.x * this.size) / this.rows;
+    ctx.beginPath();
     ctx.moveTo(l, t + this.size / this.rows);
     ctx.lineTo(
       l + this.size / this.cols,
@@ -74,6 +77,7 @@ export default class Cell {
 
     let l = (this.y * this.size) / this.cols;
     let t = (this.x * this.size) / this.rows;
+    ctx.beginPath();
     ctx.moveTo(l, t);
     ctx.lineTo(l, t + this.size / this.rows);
     ctx.stroke();
@@ -82,29 +86,29 @@ export default class Cell {
   removeWalls(cell1, cell2) {
     let x = cell1.y - cell2.y;
 
-    if (x == 1) {
+    if (x === 1) {
       cell1.walls.left = false;
       cell2.walls.right = false;
-    } else if (x == -1) {
+    } else if (x === -1) {
       cell1.walls.right = false;
       cell2.walls.left = false;
     }
 
     let y = cell1.x - cell2.x;
 
-    if (y == 1) {
+    if (y === 1) {
       cell1.walls.top = false;
       cell2.walls.bottom = false;
-    } else if (y == -1) {
+    } else if (y === -1) {
       cell1.walls.bottom = false;
       cell2.walls.top = false;
     }
   }
 
-  highlight() {
+  highlight(color) {
     let canvas = document.getElementById("mazeCanvas");
     let ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#82b1f7";
+    ctx.fillStyle = color;
     ctx.fillRect(
       (this.y * this.size) / this.cols + 5,
       (this.x * this.size) / this.rows + 5,
@@ -130,7 +134,7 @@ export default class Cell {
       for (const j_prop in j)
         if (
           (i[i_prop] !== this.x || j[j_prop] !== this.y) &&
-          (i[i_prop] !== i["c"] || j[j_prop] !== j["c"]) &&
+          (i[i_prop] == this.x || j[j_prop] == this.y) &&
           i[i_prop] <= this.rows - 1 &&
           i[i_prop] >= 0 &&
           j[j_prop] <= this.cols - 1 &&
@@ -139,8 +143,11 @@ export default class Cell {
           neighbours.push(grid[i[i_prop]][j[j_prop]]);
         }
 
-    console.log(neighbours);
-    let num = Math.floor(Math.random() * neighbours.length);
-    return neighbours[num];
+    let validNeighbours = [];
+    for (let i = 0; i < neighbours.length; i++)
+      if (!neighbours[i].visited)
+        validNeighbours.push(neighbours[i]);
+
+    return validNeighbours;
   }
 }

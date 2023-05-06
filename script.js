@@ -28,30 +28,73 @@ class MazeBuilder {
           this.cols
         );
         row.push(cell);
-        cell.buildCell();
+        //cell.buildCell();
       }
       this.grid.push(row);
     }
 
+    this.render(this.grid[0][0]);
     this.grid[0][0].visited = true;
   }
 
-  render() {
+  render(current) {
     console.log("RENDERING");
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "black";
     ctx.fillRect(0, 0, this.size, this.size);
 
     for (let r = 0; r < this.rows; r++)
       for (let c = 0; c < this.cols; c++)
         this.grid[r][c].buildCell();
+
+    current.highlight("#82b1f7");
+    this.grid[this.rows - 1][this.cols - 1].highlight(
+      "red"
+    );
   }
 
-  buildMaze() {
-    let current = this.grid[0][0];
-    current.highlight();
+  async buildMaze() {
+    this.setup();
+    let start = this.grid[0][0];
+    this.stack.push(start);
+
+    let current = start;
+    let neighbour;
+
+    while (this.stack.length > 0) {
+      current = this.stack.pop();
+      if (current.getNeighbour(this.grid).length > 0) {
+        this.stack.push(current);
+        let num = Math.floor(
+          Math.random() *
+            current.getNeighbour(this.grid).length
+        );
+        neighbour = current.getNeighbour(this.grid)[num];
+        current.removeWalls(current, neighbour);
+        neighbour.visited = true;
+        this.stack.push(neighbour);
+      }
+      await sleep(20).then(() => this.render(current));
+    }
   }
 }
 
-let mz = new MazeBuilder(800, 12, 10);
-mz.buildMaze();
-console.log(mz.grid[0][0].getNeighbour(mz.grid));
+async function sleep(millis) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, millis);
+  });
+}
+
+let diff = document.getElementById("diffSelect");
+let diff_value;
+diff.addEventListener("change", () => {
+  diff_value = diff.value;
+  console.log(diff_value);
+});
+
+let startBtn = document.getElementById("startMazeBtn");
+startBtn.addEventListener("click", () => {
+  let mz = new MazeBuilder(800, diff_value, diff_value);
+  mz.buildMaze();
+});
