@@ -36,7 +36,7 @@ body {
 input,
 select {
   cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: #82b1f7;
   height: 45px;
   width: 150px;
   padding: 10px;
@@ -57,9 +57,14 @@ input:active,
 select:active {
   background-color: black;
 }
+
 input:focus,
 select:focus {
   outline: none;
+}
+
+input:disabled {
+  background-color: rgba(0, 0, 0, 0.7);
 }
 .custom-select {
   display: inline-block;

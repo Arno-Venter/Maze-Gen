@@ -1,5 +1,5 @@
 import Cell from "./cell.js";
-const TIME = 1;
+const TIME = 5;
 
 var canvas = document.getElementById("mazeCanvas");
 
@@ -129,22 +129,27 @@ class MazeBuilder {
   }
 }
 
+let startBtn = document.getElementById("startMazeBtn");
+let solveBtn = document.getElementById("solveMazeBtn");
 let diff = document.getElementById("diffSelect");
 let diff_value;
 diff.addEventListener("change", () => {
   diff_value = diff.value;
+  startBtn.disabled = false;
+  solveBtn.disabled = false;
+  mz = new MazeBuilder(800, diff_value, diff_value);
 });
 
-let startBtn = document.getElementById("startMazeBtn");
 if (!diff_value) diff_value = 10;
-let mz = new MazeBuilder(800, 30, 30);
+let mz = new MazeBuilder(800, diff_value, diff_value);
 
 startBtn.addEventListener("click", () => {
+  startBtn.disabled = true;
   mz.buildMaze();
 });
 
-let solveBtn = document.getElementById("solveMazeBtn");
 solveBtn.addEventListener("click", () => {
+  solveBtn.disabled = true;
   console.log(
     mz.solveMaze().then(async () => {
       await console.log(mz.shortPathStack);
