@@ -1,9 +1,16 @@
 import Cell from "./cell.js";
-const TIME = 5;
+const TIME = 0.0001;
 
 var canvas = document.getElementById("mazeCanvas");
 
 var ctx = canvas.getContext("2d");
+
+async function solve() {
+  await mz.solveMaze().then(() => {
+    for (let i = 0; i < mz.returnStack.length; i++)
+      mz.returnStack[i].highlight("red");
+  });
+}
 
 class MazeBuilder {
   constructor(size, rows, cols) {
@@ -14,6 +21,7 @@ class MazeBuilder {
     this.stack = [];
     this.setup();
     this.shortPathStack = [];
+    this.returnStack = [];
   }
 
   setup() {
@@ -111,9 +119,16 @@ class MazeBuilder {
         );
         neighbour = current.getNeighbours(this.grid)[num];
 
-        if (JSON.stringify(current) == JSON.stringify(goal))
+        if (
+          //JSON.stringify(current) == JSON.stringify(goal) ||
+          JSON.stringify(neighbour) == JSON.stringify(goal)
+        ) {
+          this.returnStack = [...this.shortPathStack];
+          console.log("BREAK");
+          neighbour.highlight("red");
+          current.highlight("red");
           break;
-        else {
+        } else {
           this.stack.push(current);
           this.stack.push(neighbour);
           neighbour.visited = true;
@@ -131,12 +146,12 @@ class MazeBuilder {
 
 let startBtn = document.getElementById("startMazeBtn");
 let solveBtn = document.getElementById("solveMazeBtn");
+solveBtn.disabled = true;
 let diff = document.getElementById("diffSelect");
 let diff_value;
 diff.addEventListener("change", () => {
   diff_value = diff.value;
   startBtn.disabled = false;
-  solveBtn.disabled = false;
   mz = new MazeBuilder(800, diff_value, diff_value);
 });
 
@@ -145,16 +160,11 @@ let mz = new MazeBuilder(800, diff_value, diff_value);
 
 startBtn.addEventListener("click", () => {
   startBtn.disabled = true;
+  solveBtn.disabled = false;
   mz.buildMaze();
 });
 
 solveBtn.addEventListener("click", () => {
   solveBtn.disabled = true;
-  console.log(
-    mz.solveMaze().then(async () => {
-      await console.log(mz.shortPathStack);
-      for (let i = 0; i < mz.shortPathStack.length; i++)
-        mz.shortPathStack[i].highlight("red");
-    })
-  );
+  solve();
 });

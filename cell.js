@@ -111,11 +111,11 @@ export default class Cell {
     ctx.fillStyle = color;
     ctx.fillRect(
       (this.y * this.size) / this.cols +
-        0.15 * (this.size / this.cols),
+        0.3 * (this.size / this.cols),
       (this.x * this.size) / this.rows +
-        0.15 * (this.size / this.rows),
-      this.size / this.cols - 0.3 * (this.size / this.cols),
-      this.size / this.rows - 0.3 * (this.size / this.rows)
+        0.3 * (this.size / this.rows),
+      this.size / this.cols - 0.6 * (this.size / this.cols),
+      this.size / this.rows - 0.6 * (this.size / this.rows)
     );
   }
 

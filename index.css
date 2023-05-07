@@ -66,6 +66,7 @@ select:focus {
 input:disabled {
   background-color: rgba(0, 0, 0, 0.7);
 }
+
 .custom-select {
   display: inline-block;
 }
